@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
+  private readonly users: User[] = [];
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -16,14 +17,16 @@ export class UserService {
     
   ) {}
 
+ 
+
   async create(user: User): Promise<User> {
 
+    
     const existingUser = await this.findByUsername(user.username);
 
     if (existingUser) {
       throw new BadRequestException('Username is already taken');
     }
-
 
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(user.password, saltRounds);
@@ -70,4 +73,28 @@ export class UserService {
 
     return { user, accessToken };
   }
+
+
+
+
+  async approveUser(userId: number): Promise<void> {
+    const User = await this.findUserById(userId);
+    if (!User) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    User.status = 'approved';
+    await this.userRepository.save(User);
+  }
+  
+  async rejectUser(userId: number): Promise<void> {
+    const User = await this.findUserById(userId);
+    if (!User) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    User.status = 'rejected';
+    await this.userRepository.save(User);
+  }
+  
+
+
 }
