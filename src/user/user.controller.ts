@@ -1,5 +1,5 @@
 // src/user/user.controller.ts
-import { Controller, Post, Body, Get, UnauthorizedException, NotFoundException, Param  } from '@nestjs/common';
+import { Controller, Post, Body, Get, Put, UnauthorizedException, NotFoundException, Param  } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.entity';
 
@@ -40,4 +40,10 @@ export class UserController {
   async rejectUser(@Param('userId') userId: number): Promise<string> {
     await this.userService.rejectUser(userId);
     return 'User rejected';
-  }}
+  }
+
+  @Put(':userId')
+  async update(@Param('userId') userId: string, @Body() updatedUser: User): Promise<User> {
+    return await this.userService.updateUser(parseInt(userId, 10), updatedUser);
+  }
+}

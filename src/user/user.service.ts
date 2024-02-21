@@ -95,6 +95,18 @@ export class UserService {
     await this.userRepository.save(User);
   }
   
+  async updateUser(userId: number, updatedUser: User): Promise<User> {
+    const user = await this.findUserById(userId);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    
+    const {userType, status } = updatedUser;
+    user.userType = userType;
+    user.status = status;
+
+    return await this.userRepository.save(user);
+  }
 
 
 }
