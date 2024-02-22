@@ -19,7 +19,10 @@ export class CR {
   description : string;
 
   @Column()
-  type: string;
+  type : string;
+
+  @Column()
+  priority: string;
 
 
  
