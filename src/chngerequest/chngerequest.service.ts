@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CR } from './chngerequest.entity';
 
+
 @Injectable()
 export class CrService {
   constructor(
@@ -28,4 +29,11 @@ export class CrService {
   async delete(crId: number): Promise<void> {
     await this.CrRepository.delete(crId);
   }
+
+  async updatePriority(crId: number, priority: string): Promise<CR> {
+    const cr = await this.CrRepository.findOne({ where: { crId } });
+    cr.priority = priority;
+    return await this.CrRepository.save(cr);
+}
+
 }

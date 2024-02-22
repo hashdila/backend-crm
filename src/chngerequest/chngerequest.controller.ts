@@ -21,14 +21,15 @@ export class CrController {
     return this.crService.create(cr);
   }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() cr: CR): Promise<CR> {
-    return this.crService.update(+id, cr);
+
+  @Put(':crId/priority')
+  async updateCrPriority(@Param('crId') crId: number, @Body('priority') priority: string) {
+    return await this.crService.updatePriority(crId, priority);
   }
 
-  @Delete(':id')
-  delete(@Param('id') id: string): Promise<void> {
-    return this.crService.delete(+id);
+  @Delete(':crId')
+  delete(@Param('crId') crId: string): Promise<void> {
+    return this.crService.delete(+crId);
   }
   
   
