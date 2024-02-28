@@ -1,9 +1,13 @@
 // src/user/user.controller.ts
-import { Controller, Post, Body, Get, Put, UnauthorizedException, NotFoundException, Param  } from '@nestjs/common';
+import { Controller, Post, Body, Get, Put, UnauthorizedException, NotFoundException, Param, UseGuards  } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.entity';
+import { JwtService } from '@nestjs/jwt';
+
+
 
 @Controller('users')
+@UseGuards(JwtService)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -27,8 +31,10 @@ export class UserController {
 
   @Get()
   async getAllUsers(): Promise<User[]> {
-    return await this.userService.findAll();
+    return await this.userService.findAll(User);
   }
+
+
 
   @Post('approve/:userId')
   async approveUser(@Param('userId') userId: number): Promise<string> {

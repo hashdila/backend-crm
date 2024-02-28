@@ -1,5 +1,5 @@
 // src/user/user.service.ts
-import { Injectable, NotFoundException, UnauthorizedException,BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -15,29 +15,29 @@ export class UserService {
     private readonly jwtService: JwtService,
 
     
-  ) {}
 
- 
-
+  ) { }
   async create(user: User): Promise<User> {
-
-    
     const existingUser = await this.findByUsername(user.username);
-
     if (existingUser) {
       throw new BadRequestException('Username is already taken');
     }
-
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(user.password, saltRounds);
     user.password = hashedPassword;
-
     return await this.userRepository.save(user);
   }
 
-  async findAll(): Promise<User[]> {
+
+
+  
+
+  async findAll(req): Promise<User[]> {
+    const user = req['user'];
     return await this.userRepository.find();
   }
+
+
 
   async findUserById(userId: number): Promise<User> {
     return this.userRepository.findOne({ where: { userId } });
@@ -85,7 +85,7 @@ export class UserService {
     User.status = 'approved';
     await this.userRepository.save(User);
   }
-  
+
   async rejectUser(userId: number): Promise<void> {
     const User = await this.findUserById(userId);
     if (!User) {
@@ -94,14 +94,14 @@ export class UserService {
     User.status = 'rejected';
     await this.userRepository.save(User);
   }
-  
+
   async updateUser(userId: number, updatedUser: User): Promise<User> {
     const user = await this.findUserById(userId);
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
-    
-    const {userType, status } = updatedUser;
+
+    const { userType, status } = updatedUser;
     user.userType = userType;
     user.status = status;
 
