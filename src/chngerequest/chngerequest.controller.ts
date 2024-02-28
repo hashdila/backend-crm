@@ -23,14 +23,22 @@ export class CrController {
 
 
   @Put(':crId/priority')
-  async updateCrPriority(@Param('crId') crId: number, @Body('priority') priority: string) {
+  async updateCrPriority(@Param('crId') crId: number, @Body('priority') priority: number) {
     return await this.crService.updatePriority(crId, priority);
   }
+
+  
+
+ 
 
   @Delete(':crId')
   delete(@Param('crId') crId: string): Promise<void> {
     return this.crService.delete(+crId);
   }
   
+  @Get('highest-priority')
+  async getHighestPriority(): Promise<number> {
+    return this.crService.getHighestPriority();
+  }
   
 }

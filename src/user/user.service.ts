@@ -1,12 +1,15 @@
 // src/user/user.service.ts
-import { Injectable, NotFoundException, UnauthorizedException,BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') { }
+
 export class UserService {
   private readonly users: User[] = [];
   constructor(
@@ -14,14 +17,14 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
 
-    
-  ) {}
 
- 
+  ) { }
+
+
 
   async create(user: User): Promise<User> {
 
-    
+
     const existingUser = await this.findByUsername(user.username);
 
     if (existingUser) {
@@ -47,7 +50,7 @@ export class UserService {
     return await this.userRepository.findOne({ where: { username } });
   }
 
-  async login(username: string, password: string): Promise<{ user: User; accessToken: string }> {
+  async login(username: string, password: string): Promise<{ user: User; accessToken: string, userType: string }> {
     const user = await this.findByUsername(username);
 
     if (!user) {
@@ -71,7 +74,7 @@ export class UserService {
     const payload = { username: user.username, sub: user.userId, userType: user.userType };
     const accessToken = this.jwtService.sign(payload);
 
-    return { user, accessToken };
+    return { user, accessToken, userType: user.userType };
   }
 
 
@@ -85,7 +88,7 @@ export class UserService {
     User.status = 'approved';
     await this.userRepository.save(User);
   }
-  
+
   async rejectUser(userId: number): Promise<void> {
     const User = await this.findUserById(userId);
     if (!User) {
@@ -94,18 +97,31 @@ export class UserService {
     User.status = 'rejected';
     await this.userRepository.save(User);
   }
-  
+
   async updateUser(userId: number, updatedUser: User): Promise<User> {
     const user = await this.findUserById(userId);
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
-    
-    const {userType, status } = updatedUser;
+
+    const { userType, status } = updatedUser;
     user.userType = userType;
     user.status = status;
 
     return await this.userRepository.save(user);
+  }
+
+  async getUserProfile(userId: number): Promise<Partial<User>> {
+    const user = await this.findUserById(userId);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    // Return only the fields you want to include in the profile
+    return {
+      username: user.username,
+
+      // Add more fields as needed
+    };
   }
 
 

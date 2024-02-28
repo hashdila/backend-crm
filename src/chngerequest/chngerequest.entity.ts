@@ -22,8 +22,10 @@ export class CR {
   type : string;
 
   @Column()
-  priority: string;
+  priority: number;
 
+  @Column({ type: 'blob', nullable: true })
+  file: Buffer;
 
  
 

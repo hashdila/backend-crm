@@ -30,10 +30,22 @@ export class CrService {
     await this.CrRepository.delete(crId);
   }
 
-  async updatePriority(crId: number, priority: string): Promise<CR> {
+  async updatePriority(crId: number, priority: number): Promise<CR> {
     const cr = await this.CrRepository.findOne({ where: { crId } });
     cr.priority = priority;
     return await this.CrRepository.save(cr);
 }
+
+async getHighestPriority(): Promise<number> {
+  const query = this.CrRepository
+    .createQueryBuilder('cr')
+    .select('MAX(cr.priority)', 'highestPriority');
+
+  const result = await query.getRawOne();
+
+  return result.highestPriority || 0;
+}
+
+
 
 }
