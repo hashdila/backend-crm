@@ -3,13 +3,14 @@ import { Controller, Post, Body, Get, Put, UnauthorizedException, NotFoundExcept
 import { UserService } from './user.service';
 import { User } from './user.entity';
 import { JwtService } from '@nestjs/jwt';
+import {JwtAuthGuard} from '../authuntication/JwtAuthGuard'
 
 
 
 @Controller('users')
 @UseGuards(JwtService)
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private  userService: UserService) {}
 
   @Post('register')
   async register(@Body() user: User): Promise<User> {
@@ -29,11 +30,13 @@ export class UserController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getAllUsers(): Promise<User[]> {
-    return await this.userService.findAll(User);
+    return await this.userService.findAll();
   }
 
+  
 
 
   @Post('approve/:userId')
