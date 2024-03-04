@@ -32,10 +32,10 @@ export class UserService {
 
   
 
-  async findAll(req): Promise<User[]> {
-    const user = req['user'];
-    return await this.userRepository.find();
+  async findAll(userId: number): Promise<User> {
+    return await this.userRepository.findOne({ where: { userId } });
   }
+  
 
 
 

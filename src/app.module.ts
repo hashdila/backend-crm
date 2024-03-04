@@ -34,6 +34,12 @@ import { AuthorizationMiddleware } from './authorization.middleware';
       AdminModule,
   ],
 })
+
+
+
+
+
+
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
